@@ -26,7 +26,7 @@ def metrics():
     metrics_dict.update({"la_15":la[2]})
     #print("la - ",psutil.getloadavg( ))
     # metrics_dict.update({"cpu_percent":psutil.cpu_percent(interval=0.5)})
-    
+
     # net_stat=psutil.net_io_counters(pernic=True, nowrap=True)["enp1s0"]
     # net_in_1 = net_stat.bytes_recv
     # net_out_1 = net_stat.bytes_sent
@@ -39,7 +39,7 @@ def metrics():
     # net_out = round((net_out_2 - net_out_1) / 1024 / 1024, 3)
     # print(f"Current net-usage:\nIN: {net_in} MB/s, OUT: {net_out} MB/s")
     # metrics_dict.update({"net_speed":str(str(net_in)+"/"+str(net_out))})
-    
+
     return metrics_dict
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -54,6 +54,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(str(metrics()), 'utf-8'))#b'Hello, world!')
 
 
-httpd = HTTPServer(('192.168.50.45', 8009), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('192.168.50.45', 8010), SimpleHTTPRequestHandler)
 httpd.serve_forever()
 # print(type(str(metrics())),"\n", str(metrics()))
