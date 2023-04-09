@@ -1,3 +1,4 @@
+#import os;import time;while True: time.sleep(1); print(os.get_terminal_size())
 from time import sleep, time
 from dashing import *
 import math
@@ -18,7 +19,7 @@ ui = VSplit(
 
 			HSplit(
 				# ui.items[1].items[0].items[0].items[0]
-				HGauge(title="cpu_temp", label="43°C", val=43, border_color=5),
+				HGauge(title="cpu_temp", label="3°C", val=3, border_color=5),
 				# ui.items[1].items[0].items[0].items[1]
 				HGauge(title="storage(0.91TB)", label="250GB",
 					   val=100, border_color=1, color=1),
@@ -177,12 +178,12 @@ def times():
 	if (len(second) < 2):
 		second = "0"+second
 	times = (
-		"   \x1B[37m"+r1[hour[0]]+" "+r1[hour[1]]+r1[':']+r1[minute[0]]+" "+r1[minute[1]]+r1[':']+r1[second[0]]+" "+r1[second[1]] + "\x1B[0m\n" +
-		"   \x1B[37m"+r2[hour[0]]+" "+r2[hour[1]]+r2[':']+r2[minute[0]]+" "+r2[minute[1]]+r2[':']+r2[second[0]]+" "+r2[second[1]] + "\x1B[0m\n" +
-		"   \x1B[37m"+r3[hour[0]]+" "+r3[hour[1]]+r3[':']+r3[minute[0]]+" "+r3[minute[1]]+r3[':']+r3[second[0]]+" "+r3[second[1]] + "\x1B[0m\n" +
-		"   \x1B[37m"+r4[hour[0]]+" "+r4[hour[1]]+r4[':']+r4[minute[0]]+" "+r4[minute[1]]+r4[':']+r4[second[0]]+" "+r4[second[1]] + "\x1B[0m\n" +
-		"   \x1B[37m"+r5[hour[0]]+" "+r5[hour[1]]+r5[':']+r5[minute[0]]+" " +
-		r5[minute[1]]+r5[':']+r5[second[0]]+" "+r5[second[1]] + "\x1B[0m\n"
+		"\n    \x1B[37m"+r1[hour[0]]+" "+r1[hour[1]]+r1[':']+r1[minute[0]]+" "+r1[minute[1]]+r1[':']+r1[second[0]]+" "+r1[second[1]] + "\x1B[0m\n" +
+		"    \x1B[37m"+r2[hour[0]]+" "+r2[hour[1]]+r2[':']+r2[minute[0]]+" "+r2[minute[1]]+r2[':']+r2[second[0]]+" "+r2[second[1]] + "\x1B[0m\n" +
+		"    \x1B[37m"+r3[hour[0]]+" "+r3[hour[1]]+r3[':']+r3[minute[0]]+" "+r3[minute[1]]+r3[':']+r3[second[0]]+" "+r3[second[1]] + "\x1B[0m\n" +
+		"    \x1B[37m"+r4[hour[0]]+" "+r4[hour[1]]+r4[':']+r4[minute[0]]+" "+r4[minute[1]]+r4[':']+r4[second[0]]+" "+r4[second[1]] + "\x1B[0m\n" +
+		"    \x1B[37m"+r5[hour[0]]+" "+r5[hour[1]]+r5[':']+r5[minute[0]]+" " +
+		r5[minute[1]]+r5[':']+r5[second[0]]+" "+r5[second[1]] + "\x1B[0m"
 		# "                     \x1B[31m date: "+ str(ctime.day)+"."+str(ctime.month)+"."+str(ctime.year)
 	)
 	return times
@@ -195,18 +196,30 @@ def main(term):
 	ram =ui.items[1].items[0].items[1].items[0].items[0]
 	la = ui.items[1].items[0].items[1].items[0].items[1]
 	with term.cbreak(), term.hidden_cursor(), term.fullscreen():
+		op = 1
 		while True:
+			op = op +5
+			if op > 100:
+				op =1
 			met = load_metrics()
 			ctime = datetime.now()
+
 			timeS.text = times()  
 			timeS.title = str(str(ctime.day)+"."+str(ctime.month)+"."+str(ctime.year))
-			cpuTEMP.label = str(met["cpu_temp_current:"])+'°C'  # cpu_temp
-			cpuTEMP.append( float(met["cpu_temp_current:"])*100/float(met["cpu_temp_high:"]) ) # cpu_temp
-			stor.append((int(met["storage_total"] )-int(met["storage_free"]))*100/int(met["storage_total"] )) # storage
-			ram.label="3"
-			la.text = "4" # la
+
+			cpuTEMP.title = "cpu_temp"+"("+str(met["cpu_temp_high:"])+'°C' +")" 
+			cpuTEMP.label =   str(met["cpu_temp_current:"])+'°C'  # cpu_temp
+			cpuTEMP.value= float(met["cpu_temp_current:"])*100/float(met["cpu_temp_high:"])# cpu_temp
+
+			stor.title = "NAS"+"("+ str(met["storage_total"])+"GB)"
+			stor.label = str(int(met["storage_total"] )-int(met["storage_free"])) + "GB" 
+			stor.value=((int(met["storage_total"] )-int(met["storage_free"]))*100/int(met["storage_total"] )) # storage
+			
+			ram.value = met["ram_usage"]
+
+			la.text = "   5m-"+str(met["la_5"])+"|       |10m-"+str(met["la_10"])+" \n         |15m-"+str(met["la_15"])+"|" # la
 			ui.display()
-			time.sleep(1)
+			sleep(1)
 
 
 def load_metrics():
